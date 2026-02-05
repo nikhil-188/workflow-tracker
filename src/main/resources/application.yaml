@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: workflow-tracker
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/workflow_tracker
+    username: postgres
+    password: "Rahane*188"
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      mode: never
+
+server:
+  port: 8080
