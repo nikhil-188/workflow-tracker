@@ -1,5 +1,7 @@
 package com.workflowtracker.service;
 
+import com.workflowtracker.dto.TaskResponseDto;
+import com.workflowtracker.dto.UserResponseDto;
 import com.workflowtracker.entity.*;
 import com.workflowtracker.repository.TaskRepository;
 import com.workflowtracker.repository.UserRepository;
@@ -18,13 +20,13 @@ public class TaskService
     private UserRepository userRepository;
 
     //Create a task by manager and assign to employee
-    public Task createTask(
-            String title, String description, Priority priority, Long managerId, Long assignedtoUserId, LocalDate dueDate)
+    public TaskResponseDto createTask(
+            String title, String description, Priority priority, Long managerId, Long assignedToUserId, LocalDate dueDate)
     {
         User manager = userRepository.findById(managerId)
                 .orElseThrow(() -> new RuntimeException("Manager not found"));
 
-        User employee = userRepository.findById(assignedtoUserId)
+        User employee = userRepository.findById(assignedToUserId)
                 .orElseThrow(() -> new RuntimeException("Assigned user not found"));
 
         //Business rule task can be assigned to only employee
@@ -37,24 +39,62 @@ public class TaskService
                 .title(title)
                 .description(description)
                 .priority(priority)
+                .dueDate(dueDate)
                 .createdBy(manager)
                 .assignedTo(employee)
-                .dueDate(dueDate)
                 .build();
 
         //status + createdAt handled by @PrePersist
-        return taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
+
+        return mapToDto(savedTask);
     }
 
     //Get tasks assigned to employee
-    public List<Task> getTasksForEmployee(User employee)
+    public List<TaskResponseDto> getTasksForEmployee(Long employeeId)
     {
-        return taskRepository.findByAssignedTo(employee);
+        User employee = userRepository.findById(employeeId).orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        return taskRepository.findByAssignedTo(employee)
+                .stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     //Get tasks created by manager
-    public List<Task> getTasksCreatedByManager(User manager)
+    public List<TaskResponseDto> getTasksCreatedByManager(Long managerId)
     {
-        return taskRepository.findByCreatedBy(manager);
+        User manager = userRepository.findById(managerId).orElseThrow(() -> new RuntimeException("Manager not found"));
+
+        return taskRepository.findByCreatedBy(manager)
+                .stream()
+                .map(this::mapToDto)
+                .toList();
+    }
+
+    //Centralized mapped logic
+    private TaskResponseDto mapToDto(Task task)
+    {
+        return new TaskResponseDto(
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getStatus(),
+                task.getPriority(),
+                task.getDueDate(),
+                task.getCreatedAt(),
+                mapUser(task.getCreatedBy()),
+                mapUser(task.getAssignedTo())
+        );
+    }
+
+    private UserResponseDto mapUser(User user)
+    {
+        return new UserResponseDto(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole()
+        );
     }
 }

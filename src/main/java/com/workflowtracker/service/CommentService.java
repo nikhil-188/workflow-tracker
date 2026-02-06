@@ -1,5 +1,6 @@
 package com.workflowtracker.service;
 
+import com.workflowtracker.dto.CommentResponseDto;
 import com.workflowtracker.entity.Comment;
 import com.workflowtracker.entity.Task;
 import com.workflowtracker.entity.User;
@@ -16,15 +17,13 @@ public class CommentService {
 
     @Autowired
     private CommentRepository commentRepository;
-
     @Autowired
     private TaskRepository taskRepository;
-
     @Autowired
     private UserRepository userRepository;
 
     // Add a comment to a task
-    public Comment addComment(Long taskId, Long authorId, String content) {
+    public CommentResponseDto addComment(Long taskId, Long authorId, String content) {
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
@@ -38,15 +37,33 @@ public class CommentService {
                 .author(author)
                 .build();
 
-        return commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
+
+        return mapToDto(savedComment);
     }
 
     // Get all comments for a task
-    public List<Comment> getCommentsForTask(Long taskId) {
+    public List<CommentResponseDto> getCommentsForTask(Long taskId) {
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
-        return commentRepository.findByTask(task);
+        return commentRepository.findByTask(task)
+                .stream()
+                .map(this::mapToDto)
+                .toList();
+    }
+
+    //centralized mapping logic
+    private CommentResponseDto mapToDto(Comment comment)
+    {
+        return new CommentResponseDto(
+                comment.getId(),
+                comment.getContent(),
+                comment.getCreatedAt(),
+                comment.getTask().getId(),
+                comment.getAuthor().getId(),
+                comment.getAuthor().getName()
+        );
     }
 }

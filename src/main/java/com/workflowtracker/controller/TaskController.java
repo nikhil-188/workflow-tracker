@@ -1,5 +1,6 @@
 package com.workflowtracker.controller;
 
+import com.workflowtracker.dto.TaskResponseDto;
 import com.workflowtracker.entity.*;
 import com.workflowtracker.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class TaskController
 
     //Manager creates tasks
     @PostMapping
-    public Task createTask(
+    public TaskResponseDto createTask(
             @RequestParam String title,
             @RequestParam String description,
             @RequestParam Priority priority,
@@ -36,21 +37,15 @@ public class TaskController
 
     //Employee views tasks assigned to him
     @GetMapping("/employee/{employeeId}")
-    public List<Task> getTasksForEmployee(@PathVariable Long employeeId)
+    public List<TaskResponseDto> getTasksForEmployee(@PathVariable Long employeeId)
     {
-        User employee = new User();
-        employee.setId(employeeId);
-
-        return taskService.getTasksForEmployee(employee);
+        return taskService.getTasksForEmployee(employeeId);
     }
 
     //Manager views tasks he created
     @GetMapping("/manager/{managerId}")
-    public List<Task> getTaskCreatedByManager(@PathVariable Long managerId)
+    public List<TaskResponseDto> getTaskCreatedByManager(@PathVariable Long managerId)
     {
-        User manager = new User();
-        manager.setId(managerId);
-
-        return taskService.getTasksCreatedByManager(manager);
+        return taskService.getTasksCreatedByManager(managerId);
     }
 }

@@ -1,5 +1,6 @@
 package com.workflowtracker.controller;
 
+import com.workflowtracker.dto.CommentResponseDto;
 import com.workflowtracker.entity.*;
 import com.workflowtracker.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ public class CommentController {
 
     // Add comment to a task
     @PostMapping
-    public Comment addComment(
+    public CommentResponseDto addComment(
             @PathVariable Long taskId,
             @RequestParam Long authorId,
             @RequestParam String content
@@ -27,7 +28,7 @@ public class CommentController {
 
     // Get all comments for a task
     @GetMapping
-    public List<Comment> getCommentsForTask(@PathVariable Long taskId) {
+    public List<CommentResponseDto> getCommentsForTask(@PathVariable Long taskId) {
         return commentService.getCommentsForTask(taskId);
     }
 }
