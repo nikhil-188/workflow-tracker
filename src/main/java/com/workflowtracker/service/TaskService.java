@@ -6,6 +6,7 @@ import com.workflowtracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -18,8 +19,11 @@ public class TaskService
 
     //Create a task by manager and assign to employee
     public Task createTask(
-            String title, String description, Priority priority, User manager,Long assignedtoUserId)
+            String title, String description, Priority priority, Long managerId, Long assignedtoUserId, LocalDate dueDate)
     {
+        User manager = userRepository.findById(managerId)
+                .orElseThrow(() -> new RuntimeException("Manager not found"));
+
         User employee = userRepository.findById(assignedtoUserId)
                 .orElseThrow(() -> new RuntimeException("Assigned user not found"));
 
@@ -35,6 +39,7 @@ public class TaskService
                 .priority(priority)
                 .createdBy(manager)
                 .assignedTo(employee)
+                .dueDate(dueDate)
                 .build();
 
         //status + createdAt handled by @PrePersist

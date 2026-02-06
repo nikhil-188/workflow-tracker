@@ -10,8 +10,8 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long>
 {
-        //Tasks assigned to a specific employee
-        List<Task> findByAssignedTo(User user);
+    //Tasks assigned to a specific employee
+    List<Task> findByAssignedTo(User user);
 
     //Tasks created by manager
     List<Task> findByCreatedBy(User user);
