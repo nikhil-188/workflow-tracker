@@ -1,0 +1,164 @@
+/* =========================
+   Global Reset & Base
+   ========================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1d2671, #c33764);
+    color: #333;
+}
+
+/* =========================
+   Centered Page Layout
+   ========================= */
+.page-center {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* =========================
+   Card Layout
+   ========================= */
+.card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 420px;
+    padding: 30px 25px;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    text-align: center;
+}
+
+/* =========================
+   Headings & Text
+   ========================= */
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1d2671;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.card h1 {
+    margin-bottom: 10px;
+}
+
+.card h3 {
+    margin: 20px 0 10px;
+    color: #1d2671;
+    font-size: 18px;
+}
+
+/* =========================
+   Buttons
+   ========================= */
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.btn {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #ffffff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+.btn-manager {
+    background: #1d2671;
+}
+
+.btn-employee {
+    background: #c33764;
+}
+
+/* =========================
+   Forms (Manager Page)
+   ========================= */
+.task-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.task-form input,
+.task-form textarea,
+.task-form select {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.task-form textarea {
+    resize: vertical;
+    min-height: 70px;
+}
+
+/* =========================
+   Task List (Employee + Manager)
+   ========================= */
+.task-list {
+    list-style: none;
+    margin-top: 20px;
+    padding: 0;
+    text-align: left;
+}
+
+.task-list li {
+    background: #f4f4f4;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* =========================
+   Result / Status Text
+   ========================= */
+.result-text {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* =========================
+   Logout Link
+   ========================= */
+.logout-link {
+    display: inline-block;
+    margin-top: 25px;
+    text-decoration: none;
+    color: #c33764;
+    font-weight: 600;
+}
+
+.logout-link:hover {
+    text-decoration: underline;
+}

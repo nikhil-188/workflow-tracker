@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manager Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="page-center">
+    <div class="card">
+
+        <h1 class="title">Manager Dashboard</h1>
+        <p class="subtitle">Create and manage tasks for your team</p>
+
+        <!-- Create Task -->
+        <h3>Create Task</h3>
+
+        <form class="task-form" onsubmit="createTask(event)">
+
+            <input type="text" id="title" placeholder="Task Title" required>
+
+            <textarea id="description" placeholder="Task Description"></textarea>
+
+            <select id="priority">
+                <option value="HIGH">HIGH</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="LOW">LOW</option>
+            </select>
+
+            <input type="number" id="assignedToUserId" placeholder="Employee ID" required>
+
+            <input type="date" id="dueDate" required>
+
+            <button type="submit" class="btn btn-manager">
+                Create Task
+            </button>
+        </form>
+
+        <p id="result" class="result-text"></p>
+
+        <!-- Task List -->
+        <h3>Tasks Created by Me</h3>
+
+        <button class="btn btn-manager" onclick="loadManagerTasks()">
+            Load My Tasks
+        </button>
+
+        <ul id="taskList" class="task-list"></ul>
+
+        <a href="index.html" class="logout-link">Logout</a>
+
+    </div>
+</div>
+
+<script src="js/manager.js"></script>
+</body>
+</html>

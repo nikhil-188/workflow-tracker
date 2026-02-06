@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="page-center">
+    <div class="card">
+
+        <h1 class="title">Employee Dashboard</h1>
+        <p class="subtitle">View and track your assigned tasks</p>
+
+        <button class="btn btn-employee" onclick="loadEmployeeTasks()">
+            Load My Tasks
+        </button>
+
+        <ul id="taskList" class="task-list"></ul>
+
+        <a href="index.html" class="logout-link">Logout</a>
+
+    </div>
+</div>
+
+<script src="js/employee.js"></script>
+</body>
+</html>
