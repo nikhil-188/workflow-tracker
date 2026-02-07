@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manager Dashboard</title>
+    <title>Manager</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -10,46 +10,36 @@
 <div class="page-center">
     <div class="card">
 
-        <h1 class="title">Manager Dashboard</h1>
-        <p class="subtitle">Create and manage tasks for your team</p>
-
-        <!-- Create Task -->
         <h3>Create Task</h3>
 
-        <form class="task-form" onsubmit="createTask(event)">
-
-            <input type="text" id="title" placeholder="Task Title" required>
-
-            <textarea id="description" placeholder="Task Description"></textarea>
-
+        <form onsubmit="createTask(event)">
+            <input id="title" placeholder="Title" required>
+            <textarea id="description" placeholder="Description"></textarea>
             <select id="priority">
                 <option value="HIGH">HIGH</option>
                 <option value="MEDIUM">MEDIUM</option>
                 <option value="LOW">LOW</option>
             </select>
-
-            <input type="number" id="assignedToUserId" placeholder="Employee ID" required>
-
+            <input id="assignedToUserId" placeholder="Employee ID" required>
             <input type="date" id="dueDate" required>
-
-            <button type="submit" class="btn btn-manager">
-                Create Task
-            </button>
+            <button type="submit">Create Task</button>
         </form>
 
-        <p id="result" class="result-text"></p>
+        <h3>Get My Tasks</h3>
+        <button onclick="getManagerTasks()">Fetch Tasks</button>
 
-        <!-- Task List -->
-        <h3>Tasks Created by Me</h3>
+        <pre id="output"></pre>
 
-        <button class="btn btn-manager" onclick="loadManagerTasks()">
-            Load My Tasks
-        </button>
+        <h3>Comments</h3>
 
-        <ul id="taskList" class="task-list"></ul>
+        <input id="commentTaskId" placeholder="Task ID">
 
-        <a href="index.html" class="logout-link">Logout</a>
+        <textarea id="commentContent" placeholder="Comment text"></textarea>
 
+        <button onclick="addComment()">Add Comment</button>
+        <button onclick="getComments()">Fetch Comments</button>
+
+        <button onclick="goBack()">Back</button>
     </div>
 </div>
 

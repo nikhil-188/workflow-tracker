@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Employee Dashboard</title>
+    <title>Employee</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -10,17 +10,23 @@
 <div class="page-center">
     <div class="card">
 
-        <h1 class="title">Employee Dashboard</h1>
-        <p class="subtitle">View and track your assigned tasks</p>
+        <h3>My Tasks</h3>
 
-        <button class="btn btn-employee" onclick="loadEmployeeTasks()">
-            Load My Tasks
-        </button>
+        <button onclick="getEmployeeTasks()">Fetch Assigned Tasks</button>
 
-        <ul id="taskList" class="task-list"></ul>
+        <pre id="output"></pre>
 
-        <a href="index.html" class="logout-link">Logout</a>
+        <h3>Comments</h3>
 
+        <input id="commentTaskId" placeholder="Task ID">
+
+        <textarea id="commentContent" placeholder="Comment text"></textarea>
+
+        <button onclick="addComment()">Add Comment</button>
+        <button onclick="getComments()">Fetch Comments</button>
+
+
+        <button onclick="goBack()">Back</button>
     </div>
 </div>
 
