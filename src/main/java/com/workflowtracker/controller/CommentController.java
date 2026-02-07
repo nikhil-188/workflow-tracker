@@ -28,7 +28,7 @@ public class CommentController {
 
     // Get all comments for a task
     @GetMapping
-    public List<CommentResponseDto> getCommentsForTask(@PathVariable Long taskId) {
-        return commentService.getCommentsForTask(taskId);
+    public List<CommentResponseDto> getCommentsForTask(@PathVariable Long taskId, @RequestParam Long userId) {
+        return commentService.getCommentsForTask(taskId,userId);
     }
 }

@@ -1,5 +1,8 @@
 const managerId = 1;
 
+/* =========================
+   Create a new task
+========================= */
 function createTask(event) {
     event.preventDefault();
 
@@ -12,17 +15,40 @@ function createTask(event) {
 
     fetch("/tasks", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
         body: params
     })
-    .then(res => res.json())
-    .then(data => output.innerText = JSON.stringify(data, null, 2))
-    .catch(err => output.innerText = err);
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                throw data.error || "Error creating task";
+            }
+            return data;
+        })
+        .then(data => {
+            output.innerText =
+                `Task created successfully\n\nTask ID: ${data.id}`;
+        })
+        .catch(err => {
+            output.innerText = err;
+            console.error(err);
+        });
 }
 
+/* =========================
+   Fetch tasks created by manager
+========================= */
 function getManagerTasks() {
     fetch(`/tasks/manager/${managerId}`)
-        .then(res => res.json())
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                throw data.error || "Error fetching tasks";
+            }
+            return data;
+        })
         .then(tasks => {
             if (tasks.length === 0) {
                 output.innerText = "No tasks created yet.";
@@ -48,16 +74,14 @@ Created At  : ${task.createdAt}
             output.innerText = text;
         })
         .catch(err => {
-            output.innerText = "Error fetching tasks";
+            output.innerText = err;
             console.error(err);
         });
 }
 
-
-function goBack() {
-    window.location.href = "index.html";
-}
-
+/* =========================
+   Add comment to a task
+========================= */
 function addComment() {
     const taskId = commentTaskId.value;
     const content = commentContent.value;
@@ -71,23 +95,34 @@ function addComment() {
     params.append("authorId", managerId);
     params.append("content", content);
 
-    fetch(`/tasks/${taskId}/comments`, {
+    fetch(`/tasks/${taskId}/comments?userId=${managerId}`, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
         body: params
     })
-    .then(res => res.json())
-    .then(data => {
-        output.innerText =
-            `Comment added by ${data.authorName}\n\n"${data.content}"`;
-        commentContent.value = "";
-    })
-    .catch(err => {
-        output.innerText = "Error adding comment";
-        console.error(err);
-    });
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                throw data.error;
+            }
+            return data;
+        })
+        .then(data => {
+            output.innerText =
+                `Comment added successfully\n\nAuthor : ${data.authorName}\nComment: ${data.content}`;
+            commentContent.value = "";
+        })
+        .catch(err => {
+            output.innerText = err;
+            console.error(err);
+        });
 }
 
+/* =========================
+   Fetch comments for a task
+========================= */
 function getComments() {
     const taskId = commentTaskId.value;
 
@@ -96,8 +131,14 @@ function getComments() {
         return;
     }
 
-    fetch(`/tasks/${taskId}/comments`)
-        .then(res => res.json())
+    fetch(`/tasks/${taskId}/comments?userId=${managerId}`)
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                throw data.error;
+            }
+            return data;
+        })
         .then(comments => {
             if (comments.length === 0) {
                 output.innerText = "No comments yet";
@@ -120,7 +161,14 @@ Created : ${c.createdAt}
             output.innerText = text;
         })
         .catch(err => {
-            output.innerText = "Error fetching comments";
+            output.innerText = err;
             console.error(err);
         });
+}
+
+/* =========================
+   Navigation
+========================= */
+function goBack() {
+    window.location.href = "index.html";
 }

@@ -1,8 +1,17 @@
 const employeeId = 2;
 
+/* =========================
+   Fetch tasks assigned to employee
+========================= */
 function getEmployeeTasks() {
     fetch(`/tasks/employee/${employeeId}`)
-        .then(res => res.json())
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                throw data.error || "Error fetching tasks";
+            }
+            return data;
+        })
         .then(tasks => {
             if (tasks.length === 0) {
                 output.innerText = "No tasks assigned.";
@@ -28,15 +37,14 @@ Created At  : ${task.createdAt}
             output.innerText = text;
         })
         .catch(err => {
-            output.innerText = "Error fetching tasks";
+            output.innerText = err;
             console.error(err);
         });
 }
 
-
-function goBack() {
-    window.location.href = "index.html";
-}
+/* =========================
+   Add comment to a task
+========================= */
 function addComment() {
     const taskId = commentTaskId.value;
     const content = commentContent.value;
@@ -50,19 +58,34 @@ function addComment() {
     params.append("authorId", employeeId);
     params.append("content", content);
 
-    fetch(`/tasks/${taskId}/comments`, {
+    fetch(`/tasks/${taskId}/comments?userId=${employeeId}`, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
         body: params
     })
-    .then(res => res.json())
-    .then(data => {
-        output.innerText =
-            `Comment added by ${data.authorName}\n\n"${data.content}"`;
-        commentContent.value = "";
-    });
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                throw data.error;
+            }
+            return data;
+        })
+        .then(data => {
+            output.innerText =
+                `Comment added successfully\n\nAuthor : ${data.authorName}\nComment: ${data.content}`;
+            commentContent.value = "";
+        })
+        .catch(err => {
+            output.innerText = err;
+            console.error(err);
+        });
 }
 
+/* =========================
+   Fetch comments for a task
+========================= */
 function getComments() {
     const taskId = commentTaskId.value;
 
@@ -71,8 +94,14 @@ function getComments() {
         return;
     }
 
-    fetch(`/tasks/${taskId}/comments`)
-        .then(res => res.json())
+    fetch(`/tasks/${taskId}/comments?userId=${employeeId}`)
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                throw data.error;
+            }
+            return data;
+        })
         .then(comments => {
             if (comments.length === 0) {
                 output.innerText = "No comments yet";
@@ -93,5 +122,16 @@ Created : ${c.createdAt}
             });
 
             output.innerText = text;
+        })
+        .catch(err => {
+            output.innerText = err;
+            console.error(err);
         });
+}
+
+/* =========================
+   Navigation
+========================= */
+function goBack() {
+    window.location.href = "index.html";
 }

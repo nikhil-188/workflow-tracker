@@ -4,6 +4,7 @@ import com.workflowtracker.dto.CommentResponseDto;
 import com.workflowtracker.entity.Comment;
 import com.workflowtracker.entity.Task;
 import com.workflowtracker.entity.User;
+import com.workflowtracker.exception.UnauthorizedTaskAccessException;
 import com.workflowtracker.repository.CommentRepository;
 import com.workflowtracker.repository.TaskRepository;
 import com.workflowtracker.repository.UserRepository;
@@ -22,6 +23,19 @@ public class CommentService {
     @Autowired
     private UserRepository userRepository;
 
+    //making sure only the respective employee can access the comments of the particular task
+    private void validateCommentAccess(Task task, User user) {
+        boolean isCreator = task.getCreatedBy().getId().equals(user.getId());
+        boolean isAssignee = task.getAssignedTo().getId().equals(user.getId());
+
+        if (!isCreator && !isAssignee) {
+            throw new UnauthorizedTaskAccessException(
+                    "You are not allowed to access comments for this task"
+            );
+
+        }
+    }
+
     // Add a comment to a task
     public CommentResponseDto addComment(Long taskId, Long authorId, String content) {
 
@@ -30,6 +44,8 @@ public class CommentService {
 
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new RuntimeException("Author not found"));
+
+        validateCommentAccess(task,author);
 
         Comment comment = Comment.builder()
                 .content(content)
@@ -43,10 +59,15 @@ public class CommentService {
     }
 
     // Get all comments for a task
-    public List<CommentResponseDto> getCommentsForTask(Long taskId) {
+    public List<CommentResponseDto> getCommentsForTask(Long taskId, Long userId) {
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("user not found"));
+
+        validateCommentAccess(task,user);
 
         return commentRepository.findByTask(task)
                 .stream()
