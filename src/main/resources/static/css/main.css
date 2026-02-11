@@ -1,0 +1,144 @@
+/* Main CSS - Raw JSON Debug Mode */
+
+:root {
+    --bg-app: #f4f6f8;
+    --font-mono: "Consolas", "Monaco", "Courier New", monospace;
+    --border-color: #ddd;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+    background-color: var(--bg-app);
+    padding: 20px;
+    color: #333;
+}
+
+.app-container {
+    max-width: 1200px;
+    /* Wider for JSON */
+    margin: 0 auto;
+    background: white;
+    border: 1px solid var(--border-color);
+    min-height: 80vh;
+}
+
+.app-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+}
+
+.app-title {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* JSON Box Styles */
+.task-list {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    /* Grid of JSON boxes */
+    gap: 20px;
+}
+
+.json-box {
+    background: #fafafa;
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+pre {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: #091e42;
+    white-space: pre-wrap;
+    /* Wrap long lines */
+}
+
+/* Buttons */
+.btn {
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    background: #eee;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.btn-primary {
+    background: #0052cc;
+    color: white;
+    border-color: #0052cc;
+}
+
+.btn-secondary {
+    background: white;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-overlay.visible {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    width: 800px;
+    max-width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.modal-body label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* Creating Inputs (still needed for Create Task) */
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    font-family: var(--font-mono);
+}

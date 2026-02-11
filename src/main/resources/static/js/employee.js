@@ -1,137 +1,150 @@
-const employeeId = 2;
+// Global State
+let currentEmployeeId = localStorage.getItem('userId');
+let currentOpenTaskId = null;
 
-/* =========================
-   Fetch tasks assigned to employee
-========================= */
-function getEmployeeTasks() {
-    fetch(`/tasks/employee/${employeeId}`)
-        .then(async res => {
-            const data = await res.json();
-            if (!res.ok) {
-                throw data.error || "Error fetching tasks";
-            }
-            return data;
-        })
-        .then(tasks => {
-            if (tasks.length === 0) {
-                output.innerText = "No tasks assigned.";
-                return;
-            }
-
-            let text = "";
-
-            tasks.forEach((task, index) => {
-                text += `
-Task ${index + 1}
-------------------
-Title       : ${task.title}
-Description : ${task.description}
-Priority    : ${task.priority}
-Due Date    : ${task.dueDate}
-Created By  : ${task.createdBy.name}
-Created At  : ${task.createdAt}
-
-`;
-            });
-
-            output.innerText = text;
-        })
-        .catch(err => {
-            output.innerText = err;
-            console.error(err);
-        });
+// Auth Check
+if (!currentEmployeeId || localStorage.getItem('role') !== 'EMPLOYEE') {
+    window.location.href = 'index.html';
 }
 
-/* =========================
-   Add comment to a task
-========================= */
-function addComment() {
-    const taskId = commentTaskId.value;
-    const content = commentContent.value;
+document.addEventListener('DOMContentLoaded', () => {
+    fetchTasks();
+});
 
-    if (!taskId || !content) {
-        output.innerText = "Task ID and comment are required";
+function logout() {
+    localStorage.clear();
+    window.location.href = 'index.html';
+}
+
+/* ---------------- API Calls ---------------- */
+
+async function fetchTasks() {
+    try {
+        const response = await fetch(`/tasks/employee/${currentEmployeeId}`);
+        if (!response.ok) throw new Error('Failed to fetch tasks');
+
+        let tasks = await response.json();
+        renderTaskList(tasks);
+    } catch (error) {
+        console.error(error);
+        document.getElementById('taskList').innerHTML =
+            `<div class="card" style="text-align: center; color: var(--danger); grid-column: 1/-1;">Error loading tasks.</div>`;
+    }
+}
+
+// Global tasks list for quick access (since we don't have getTaskById)
+let allTasks = [];
+
+function renderTaskList(tasks) {
+    allTasks = tasks;
+    const container = document.getElementById('taskList');
+
+    if (tasks.length === 0) {
+        container.innerHTML = `<div class="card" style="text-align: center; grid-column: 1/-1;">No tasks assigned to you.</div>`;
         return;
     }
 
-    const params = new URLSearchParams();
-    params.append("authorId", employeeId);
-    params.append("content", content);
-
-    fetch(`/tasks/${taskId}/comments?userId=${employeeId}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: params
-    })
-        .then(async res => {
-            const data = await res.json();
-            if (!res.ok) {
-                throw data.error;
-            }
-            return data;
-        })
-        .then(data => {
-            output.innerText =
-                `Comment added successfully\n\nAuthor : ${data.authorName}\nComment: ${data.content}`;
-            commentContent.value = "";
-        })
-        .catch(err => {
-            output.innerText = err;
-            console.error(err);
-        });
+    container.innerHTML = tasks.map(task => `
+        <div class="card task-card" onclick="showTaskDetail(${task.id})">
+            <div class="flex justify-between" style="margin-bottom: 0.5rem">
+                <span class="badge ${getPriorityBadgeClass(task.priority)}">${task.priority}</span>
+                <span class="badge badge-status">${task.status}</span>
+            </div>
+            <h3>${task.title}</h3>
+            <p class="text-sm" style="margin-bottom: 0;">Due: ${task.dueDate}</p>
+        </div>
+    `).join('');
 }
 
-/* =========================
-   Fetch comments for a task
-========================= */
-function getComments() {
-    const taskId = commentTaskId.value;
-
-    if (!taskId) {
-        output.innerText = "Task ID is required";
-        return;
+function getPriorityBadgeClass(priority) {
+    switch (priority) {
+        case 'HIGH': return 'badge-high';
+        case 'MEDIUM': return 'badge-medium';
+        case 'LOW': return 'badge-low';
+        default: return 'badge-status';
     }
-
-    fetch(`/tasks/${taskId}/comments?userId=${employeeId}`)
-        .then(async res => {
-            const data = await res.json();
-            if (!res.ok) {
-                throw data.error;
-            }
-            return data;
-        })
-        .then(comments => {
-            if (comments.length === 0) {
-                output.innerText = "No comments yet";
-                return;
-            }
-
-            let text = "";
-
-            comments.forEach((c, index) => {
-                text += `
-Comment ${index + 1}
-------------------
-Author  : ${c.authorName}
-Content : ${c.content}
-Created : ${c.createdAt}
-
-`;
-            });
-
-            output.innerText = text;
-        })
-        .catch(err => {
-            output.innerText = err;
-            console.error(err);
-        });
 }
 
-/* =========================
-   Navigation
-========================= */
-function goBack() {
-    window.location.href = "index.html";
+function showTaskDetail(taskId) {
+    const task = allTasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    currentOpenTaskId = taskId;
+
+    // Populate Modal
+    document.getElementById('detailTitle').innerText = task.title;
+    document.getElementById('detailDescription').innerText = task.description;
+    document.getElementById('detailPriority').innerText = task.priority;
+    document.getElementById('detailPriority').className = `badge ${getPriorityBadgeClass(task.priority)}`;
+    document.getElementById('detailStatus').innerText = task.status;
+    document.getElementById('detailDueDate').innerText = task.dueDate;
+
+    // Fetch Comments
+    fetchComments(taskId);
+
+    openModal('taskDetailsModal');
+}
+
+/* ---------------- Comments ---------------- */
+
+async function fetchComments(taskId) {
+    const list = document.getElementById('commentsList');
+    list.innerHTML = '<p class="text-sm">Loading comments...</p>';
+
+    try {
+        // Fetch comments as Employee (pass userId query param)
+        const response = await fetch(`/tasks/${taskId}/comments?userId=${currentEmployeeId}`);
+        if (!response.ok) throw new Error('Failed to fetch comments');
+        const comments = await response.json();
+
+        if (comments.length === 0) {
+            list.innerHTML = '<p class="text-sm" style="text-align: center;">No comments yet.</p>';
+            return;
+        }
+
+        list.innerHTML = comments.map(c => `
+            <div class="comment-item">
+                <div class="comment-author">User ${c.authorId} &bull; ${new Date(c.createdAt).toLocaleString()}</div>
+                <div>${c.content}</div>
+            </div>
+        `).join('');
+
+    } catch (error) {
+        list.innerHTML = '<p class="text-sm text-danger">Error loading comments.</p>';
+    }
+}
+
+async function handleAddComment() {
+    const content = document.getElementById('newCommentContent').value;
+    if (!content.trim()) return;
+
+    try {
+        const params = new URLSearchParams();
+        params.append('authorId', currentEmployeeId);
+        params.append('content', content);
+
+        const response = await fetch(`/tasks/${currentOpenTaskId}/comments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params
+        });
+
+        if (!response.ok) throw new Error('Failed to add comment');
+
+        document.getElementById('newCommentContent').value = '';
+        fetchComments(currentOpenTaskId); // Refresh comments
+
+    } catch (error) {
+        alert('Error adding comment');
+    }
+}
+
+/* ---------------- UI Utils ---------------- */
+
+function openModal(modalId) {
+    document.getElementById(modalId).classList.add('open');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('open');
 }

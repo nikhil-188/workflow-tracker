@@ -23,6 +23,8 @@ public class CommentService {
     @Autowired
     private UserRepository userRepository;
 
+    //TODO use constructor injection
+
     //making sure only the respective employee can access the comments of the particular task
     private void validateCommentAccess(Task task, User user) {
         boolean isCreator = task.getCreatedBy().getId().equals(user.getId());
