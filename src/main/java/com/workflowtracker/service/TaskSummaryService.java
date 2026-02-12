@@ -5,19 +5,19 @@ import com.workflowtracker.entity.Task;
 import com.workflowtracker.entity.User;
 import com.workflowtracker.repository.TaskRepository;
 import com.workflowtracker.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-//TODO return two jsons for Tasks... task summary and task detail
 
 @Service
-public class TaskSummaryService {
-    @Autowired
-    private TaskRepository taskRepository;
-    @Autowired
-    private UserRepository userRepository;
+@RequiredArgsConstructor //this creates the constructor for DI
+public class TaskSummaryService
+{
+    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
     // Fetch tasks assigned to employee (Summary View)
     public List<TaskSummaryDto> getTasksForEmployee(Long employeeId) {

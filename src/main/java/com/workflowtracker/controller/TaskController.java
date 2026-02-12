@@ -1,8 +1,11 @@
 package com.workflowtracker.controller;
 
+import com.workflowtracker.dto.CreateTaskRequest;
 import com.workflowtracker.dto.TaskResponseDto;
+import com.workflowtracker.dto.TaskSummaryDto;
 import com.workflowtracker.entity.*;
 import com.workflowtracker.service.TaskService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,24 +14,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/tasks")
-public class TaskController {
-    @Autowired
-    private TaskService taskService;
+@RequiredArgsConstructor //this creates the constructor for DI
+public class TaskController
+{
+    private final TaskService taskService;
 
     // Manager creates tasks
-    @PostMapping
+    @PostMapping("{managerId}")
     public TaskResponseDto createTask(
-            @RequestParam String title,
-            @RequestParam String description,
-            @RequestParam Priority priority,
-            @RequestParam Long assignedToUserId,
-            @RequestParam String dueDate) {
-        // Temporary hardcoded manager (later replaced by spring security)
-        Long managerId = 1L; // assuming manager id = 1
-
-        LocalDate parsedDueDate = LocalDate.parse(dueDate);
-
-        return taskService.createTask(title, description, priority, 1L, assignedToUserId, parsedDueDate);
+            @RequestBody CreateTaskRequest request,
+            @PathVariable Long managerId)
+    {
+        return taskService.createTask(request.getTitle(), request.getDescription(), request.getPriority(), managerId, request.getAssignedToUserId(), request.getDueDate());
     }
 
     @Autowired
@@ -36,13 +33,13 @@ public class TaskController {
 
     // Employee views tasks assigned to him (Summary only)
     @GetMapping("/employee/{employeeId}")
-    public List<com.workflowtracker.dto.TaskSummaryDto> getTasksForEmployee(@PathVariable Long employeeId) {
+    public List<TaskSummaryDto> getTasksForEmployee(@PathVariable Long employeeId) {
         return taskSummaryService.getTasksForEmployee(employeeId);
     }
 
     // Manager views tasks he created (Summary only)
     @GetMapping("/manager/{managerId}")
-    public List<com.workflowtracker.dto.TaskSummaryDto> getTaskCreatedByManager(@PathVariable Long managerId) {
+    public List<TaskSummaryDto> getTaskCreatedByManager(@PathVariable Long managerId) {
         return taskSummaryService.getTasksCreatedByManager(managerId);
     }
 

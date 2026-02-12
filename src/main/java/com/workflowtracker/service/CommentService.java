@@ -8,38 +8,37 @@ import com.workflowtracker.exception.UnauthorizedTaskAccessException;
 import com.workflowtracker.repository.CommentRepository;
 import com.workflowtracker.repository.TaskRepository;
 import com.workflowtracker.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class CommentService {
-
-    @Autowired
-    private CommentRepository commentRepository;
-    @Autowired
-    private TaskRepository taskRepository;
-    @Autowired
-    private UserRepository userRepository;
-
-    //TODO use constructor injection
+@RequiredArgsConstructor //this creates the constructor for DI
+public class CommentService
+{
+    private final CommentRepository commentRepository;
+    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
     //making sure only the respective employee can access the comments of the particular task
-    private void validateCommentAccess(Task task, User user) {
+    private void validateCommentAccess(Task task, User user)
+    {
         boolean isCreator = task.getCreatedBy().getId().equals(user.getId());
         boolean isAssignee = task.getAssignedTo().getId().equals(user.getId());
 
-        if (!isCreator && !isAssignee) {
+        if (!isCreator && !isAssignee)
+        {
             throw new UnauthorizedTaskAccessException(
                     "You are not allowed to access comments for this task"
             );
-
         }
     }
 
     // Add a comment to a task
-    public CommentResponseDto addComment(Long taskId, Long authorId, String content) {
+    public CommentResponseDto addComment(Long taskId, Long authorId, String content)
+    {
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));

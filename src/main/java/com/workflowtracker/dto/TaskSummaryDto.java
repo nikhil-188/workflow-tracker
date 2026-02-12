@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class TaskSummaryDto {
-    private Long id; // Added ID because frontend needs it to click!
+    private Long id;
     private String title;
     private TaskStatus taskStatus;
     private LocalDate deadline;

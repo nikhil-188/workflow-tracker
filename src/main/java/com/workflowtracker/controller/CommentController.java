@@ -3,6 +3,7 @@ package com.workflowtracker.controller;
 import com.workflowtracker.dto.CommentResponseDto;
 import com.workflowtracker.entity.*;
 import com.workflowtracker.service.CommentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
@@ -11,10 +12,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/tasks/{taskId}/comments")
-public class CommentController {
-
-    @Autowired
-    private CommentService commentService;
+@RequiredArgsConstructor //this creates the constructor for DI
+public class CommentController
+{
+    private final CommentService commentService;
 
     // Add comment to a task
     @PostMapping
