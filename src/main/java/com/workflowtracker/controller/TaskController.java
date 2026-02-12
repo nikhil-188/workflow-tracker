@@ -19,8 +19,7 @@ public class TaskController
 
     // Manager creates tasks
     @PostMapping
-    public TaskDetailedDto createTask(
-            @RequestBody CreateTaskRequest request)
+    public TaskDetailedDto createTask(@RequestBody CreateTaskRequest request)
     {
         return taskService.createTask(request.getTitle(), request.getDescription(), request.getPriority(), request.getAssignedToUserId(), request.getDueDate());
     }

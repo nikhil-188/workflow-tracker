@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long>
 {
-    // All the comments for a task
-    List<Comment> findByTask(Task task);
+    // All the comments for a taskId
+    List<Comment> findByTask_Id(Long id);
 }

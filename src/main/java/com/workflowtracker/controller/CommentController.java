@@ -1,37 +1,34 @@
 package com.workflowtracker.controller;
 
-import com.workflowtracker.dto.CommentResponseDto;
-import com.workflowtracker.entity.*;
+import com.workflowtracker.dto.CommentDto;
+import com.workflowtracker.dto.CreateCommentRequest;
+import com.workflowtracker.entity.User;
 import com.workflowtracker.service.CommentService;
+import com.workflowtracker.service.CurrentUserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//TODO make modifications for whole comment feature after login is implemented
-
 @RestController
-@RequestMapping("/employee/{employeeId}/tasks/{taskId}/comments")
+@RequestMapping("/tasks/{taskId}/comments")
 @RequiredArgsConstructor //this creates the constructor for DI
 public class CommentController
 {
     private final CommentService commentService;
+    private final CurrentUserService currentUserService;
 
     // Add comment to a task
     @PostMapping
-    public CommentResponseDto addComment(
-            @PathVariable Long taskId,
-            @RequestParam Long authorId,
-            @RequestParam String content)
+    public CommentDto addComment(@PathVariable Long taskId, @RequestBody CreateCommentRequest request)
     {
-        return commentService.addComment(taskId, authorId, content);
+        return commentService.addComment(taskId, request.getContent());
     }
 
     // Get all comments for a task
     @GetMapping
-    public List<CommentResponseDto> getCommentsForTask(@PathVariable Long taskId, @RequestParam Long userId) {
-        return commentService.getCommentsForTask(taskId, userId);
+    public List<CommentDto> getCommentsForTask(@PathVariable Long taskId)
+    {
+        return commentService.getCommentsForTask(taskId);
     }
 }

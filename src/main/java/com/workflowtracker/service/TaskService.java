@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-
+//TODO task status should be changed
 @Service
 @RequiredArgsConstructor //this creates the constructor for DI
 public class TaskService
