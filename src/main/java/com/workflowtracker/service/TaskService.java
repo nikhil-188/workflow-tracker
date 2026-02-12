@@ -5,6 +5,7 @@ import com.workflowtracker.dto.TaskSummaryDto;
 import com.workflowtracker.dto.UserInTaskViewDto;
 import com.workflowtracker.entity.*;
 import com.workflowtracker.repository.TaskRepository;
+import com.workflowtracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,23 +17,34 @@ import java.util.List;
 public class TaskService
 {
         private final TaskRepository taskRepository;
-        private final UserValidationService userValidationService;
+        private final UserRepository userRepository;
+        private final CurrentUserService currentUserService;
 
         // Create a task by manager and assign to employee
         public TaskDetailedDto createTask(
-                        String title, String description, Priority priority, Long managerId, Long assignedToUserId,
+                        String title, String description, Priority priority, Long assignedToUserId,
                         LocalDate dueDate
         )
         {
-            User manager = userValidationService.validateManager(managerId);
-            User employee = userValidationService.validateEmployee(assignedToUserId);
+            User currentUser = currentUserService.getCurrentUser();
+
+            if(currentUser.getRole()!=Role.MANAGER)
+            {
+                throw new RuntimeException("Only Managers can create tasks");
+            }
+
+            User employee = userRepository.findById(assignedToUserId).orElseThrow(()-> new RuntimeException("Employee not found"));
+            if(employee.getRole()!=Role.EMPLOYEE)
+            {
+                throw new RuntimeException("Tasks must be assigned to only Employees");
+            }
 
             Task task = Task.builder()
                             .title(title)
                             .description(description)
                             .priority(priority)
                             .dueDate(dueDate)
-                            .createdBy(manager)
+                            .createdBy(currentUser)
                             .assignedTo(employee)
                             .build();
 
@@ -41,54 +53,42 @@ public class TaskService
             return taskDetailedDto(savedTask);
         }
 
-        //Fetch tasks assigned to employee (Summary View)
-        public List<TaskSummaryDto> getTasksForEmployee(Long employeeId)
+        //Combined method for both Manager and Employee to view tasks (Summary view)
+        public List<TaskSummaryDto> getMyTasksSummary()
         {
-            User employee = userValidationService.validateEmployee(employeeId);
+            User currentUser = currentUserService.getCurrentUser();
 
-            return taskRepository.findByAssignedTo(employee)
-                    .stream()
-                    .map((task) -> taskSummaryDto(task))
-                    .toList();
-        }
-
-        //Fetch tasks assigned to manager (Summary View)
-        public List<TaskSummaryDto> getTasksCreatedByManager(Long managerId)
-        {
-            User manager = userValidationService.validateManager(managerId);
-
-            return taskRepository.findByCreatedBy(manager)
-                    .stream()
-                    .map((task) -> taskSummaryDto(task))
-                    .toList();
-        }
-
-        //TODO when login is introduced.... these methods of employee and manager will become one since we don't pass UserId in the URL
-
-        // Get single task by employeeID (Detailed View)
-        public TaskDetailedDto getDetailedTaskByEmployeeId(Long employeeId, Long taskId)
-        {
-            User employee = userValidationService.validateEmployee(employeeId);
-            Task task = taskRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found"));
-
-            if(!task.getAssignedTo().getId().equals(employeeId))
+            if(currentUser.getRole()==Role.MANAGER)
             {
-                throw new RuntimeException("Task is not assigned to you, hence you cannot access it");
+                return taskRepository.findByCreatedBy(currentUser)
+                        .stream()
+                        .map((task) -> taskSummaryDto(task))
+                        .toList();
             }
-            return taskDetailedDto(task);
+            if(currentUser.getRole()==Role.EMPLOYEE)
+            {
+                return taskRepository.findByAssignedTo(currentUser)
+                        .stream()
+                        .map((task) -> taskSummaryDto(task))
+                        .toList();
+            }
+            throw new RuntimeException("Invalid Role");
         }
 
-        // Get single task by managerId (Detailed View)
-        public TaskDetailedDto getDetailedTaskByManagerId(Long managerId, Long taskId)
+        //Combined method for both Manager and Employee to view tasks (Summary view)
+        public TaskDetailedDto getMyTasksDetailed(Long taskId)
         {
-           User manager = userValidationService.validateManager(managerId);
-           Task task = taskRepository.findById(taskId).orElseThrow(()-> new RuntimeException("Task not found"));
-
-           if(!task.getCreatedBy().getId().equals(managerId))
-           {
-               throw new RuntimeException("The task is not created by you, hence you cannot access it");
-           }
-           return taskDetailedDto(task);
+            User currentUser = currentUserService.getCurrentUser();
+            Task task = taskRepository.findById(taskId).orElseThrow(()-> new RuntimeException("Task not found"));
+            if(currentUser.getRole()==Role.MANAGER && task.getCreatedBy().getId().equals(currentUser.getId()))
+            {
+                return taskDetailedDto(task);
+            }
+            if(currentUser.getRole()==Role.EMPLOYEE && task.getAssignedTo().getId().equals(currentUser.getId()))
+            {
+                return taskDetailedDto(task);
+            }
+            throw new RuntimeException("You are not allowed to access this task");
         }
 
         //TODO manager should be able to delete the the tasks

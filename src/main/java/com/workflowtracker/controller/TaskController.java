@@ -18,37 +18,23 @@ public class TaskController
     private final TaskService taskService;
 
     // Manager creates tasks
-    @PostMapping("{managerId}")
+    @PostMapping
     public TaskDetailedDto createTask(
-            @RequestBody CreateTaskRequest request,
-            @PathVariable Long managerId)
+            @RequestBody CreateTaskRequest request)
     {
-        return taskService.createTask(request.getTitle(), request.getDescription(), request.getPriority(), managerId, request.getAssignedToUserId(), request.getDueDate());
+        return taskService.createTask(request.getTitle(), request.getDescription(), request.getPriority(), request.getAssignedToUserId(), request.getDueDate());
     }
 
-    // Employee views tasks assigned to him (Summary only)
-    @GetMapping("/employee/{employeeId}")
-    public List<TaskSummaryDto> getTasksForEmployee(@PathVariable Long employeeId)
+    // User views tasks assigned to him (Summary only)
+    @GetMapping("/my")
+    public List<TaskSummaryDto> getMyTasksSummary()
     {
-        return taskService.getTasksForEmployee(employeeId);
+        return taskService.getMyTasksSummary();
     }
 
-    // Manager views tasks he created (Summary only)
-    @GetMapping("/manager/{managerId}")
-    public List<TaskSummaryDto> getTaskCreatedByManager(@PathVariable Long managerId)
-    {
-        return taskService.getTasksCreatedByManager(managerId);
-    }
-
-    // Employee views complete details of particular task
-    @GetMapping("/employee/{employeeId}/{taskId}")
-    public TaskDetailedDto getEmployeeTasksById(@PathVariable Long employeeId, @PathVariable Long taskId) {
-        return taskService.getDetailedTaskByEmployeeId(employeeId, taskId);
-    }
-
-    // Manager views complete details of particular task
-    @GetMapping("/manager/{managerId}/{taskId}")
-    public TaskDetailedDto getManagerTasksById(@PathVariable Long managerId, @PathVariable Long taskId) {
-        return taskService.getDetailedTaskByManagerId(managerId,taskId);
+    // User views complete details of particular task only assigned to him/created by him
+    @GetMapping("{taskId}")
+    public TaskDetailedDto getMyTasksDetailed(@PathVariable Long taskId) {
+        return taskService.getMyTasksDetailed(taskId);
     }
 }
