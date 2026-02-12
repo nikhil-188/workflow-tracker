@@ -14,7 +14,7 @@ public class UserValidationService
 
     public User validateManager(Long managerId)
     {
-        User manager = userRepository.findById(managerId).orElseThrow(() -> new RuntimeException("Manager not found"));
+        User manager = userRepository.findById(managerId).orElseThrow(() -> new RuntimeException("User not found"));
         if(manager.getRole()!= Role.MANAGER)
         {
             throw new RuntimeException("User is not manager");

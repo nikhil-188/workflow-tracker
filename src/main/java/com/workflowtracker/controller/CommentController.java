@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+//TODO make modifications for whole comment feature after login is implemented
+
 @RestController
-@RequestMapping("/tasks/{taskId}/comments")
+@RequestMapping("/employee/{employeeId}/tasks/{taskId}/comments")
 @RequiredArgsConstructor //this creates the constructor for DI
 public class CommentController
 {
@@ -22,9 +24,8 @@ public class CommentController
     public CommentResponseDto addComment(
             @PathVariable Long taskId,
             @RequestParam Long authorId,
-            @RequestParam String content) {
-        System.out.println(
-                "DEBUG: addComment called. TaskID: " + taskId + ", AuthorID: " + authorId + ", Content: " + content);
+            @RequestParam String content)
+    {
         return commentService.addComment(taskId, authorId, content);
     }
 

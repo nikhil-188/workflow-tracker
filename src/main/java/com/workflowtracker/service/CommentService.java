@@ -39,7 +39,6 @@ public class CommentService
     // Add a comment to a task
     public CommentResponseDto addComment(Long taskId, Long authorId, String content)
     {
-
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 

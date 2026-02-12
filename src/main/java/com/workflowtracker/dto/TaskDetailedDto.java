@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class TaskResponseDto
+public class TaskDetailedDto
 {
     private Long id;
     private String title;
@@ -21,6 +21,6 @@ public class TaskResponseDto
     private LocalDate dueDate;
     private LocalDateTime createdAt;
 
-    private UserResponseDto createdBy;
-    private UserResponseDto assignedTo;
+    private UserInTaskViewDto createdBy;
+    private UserInTaskViewDto assignedTo;
 }

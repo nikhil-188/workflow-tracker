@@ -19,5 +19,5 @@ public class TaskSummaryDto {
     private TaskStatus taskStatus;
     private LocalDate deadline;
     private LocalDateTime createdAt;
-    private UserSummaryDto assignedTo;
+    private UserInTaskViewDto assignedTo;
 }
